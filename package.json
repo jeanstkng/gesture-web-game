@@ -1,7 +1,7 @@
 {
-  "name": "sample-tiled-parcel",
+  "name": "ronin-run-gesture",
   "version": "1.0.0",
-  "description": "Sample Excalibur Tiled Plugin with Vite",
+  "description": "Excalibur Game that uses mediapipe to use gesture for actions packed with Vite",
   "scripts": {
     "start": "vite",
     "start:debug": "vite -d",
@@ -9,9 +9,9 @@
     "preview": "vite preview"
   },
   "author": {
-    "name": "Excalibur.js Team",
-    "email": "excaliburjs@gmail.com",
-    "url": "http://excaliburjs.com"
+    "name": "JeanStkng",
+    "email": "jeancast.jg@gmail.com",
+    "url": "https://stkngesk.tech"
   },
   "license": "BSD-2-Clause",
   "dependencies": {

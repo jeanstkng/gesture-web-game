@@ -5,12 +5,21 @@ import {
   GestureRecognizerResult,
 } from "@mediapipe/tasks-vision";
 
+export enum Gestures {
+  NONE = "none",
+  FOX = "fox",
+  SCISSORS = "scissors",
+  PAPER = "paper",
+  ROCK = "rock",
+}
+
 let gestureRecognizer: GestureRecognizer;
 let runningMode = "IMAGE";
-let webcamRunning: Boolean = false;
-const videoWidth = "480px";
-const videoHeight = "360px";
-export let isModelLoaded = false;
+const videoWidth = "360px";
+const videoHeight = "240px";
+let webcamRunning = false;
+export let isPredictionsStarted = false;
+export let lastGesture: string = Gestures.NONE;
 
 // Before we can use HandLandmarker class we must wait for it to finish
 // loading. Machine Learning models can be large and take a moment to
@@ -26,7 +35,6 @@ export const createGestureRecognizer = async () => {
     },
     runningMode: runningMode as any,
   });
-  isModelLoaded = true;
 };
 
 /********************************************************************
@@ -55,7 +63,6 @@ export function enableCam() {
     alert("Please wait for gestureRecognizer to load");
     return;
   }
-
   webcamRunning = true;
 
   // getUsermedia parameters.
@@ -73,6 +80,7 @@ export function enableCam() {
 let lastVideoTime = -1;
 let results: GestureRecognizerResult;
 async function predictWebcam() {
+  isPredictionsStarted = true;
   const webcamElement: HTMLVideoElement = document.getElementById(
     "webcam"
   ) as HTMLVideoElement;
@@ -120,8 +128,12 @@ async function predictWebcam() {
     const categoryScore = (results.gestures[0][0].score * 100).toFixed(2);
     const handedness = results.handedness[0][0].displayName;
     gestureOutput.innerText = `GestureRecognizer: ${categoryName}\n Confidence: ${categoryScore} %\n Handedness: ${handedness}`;
+    if (+categoryScore >= 60) {
+      lastGesture = categoryName.toLowerCase();
+    }
   } else {
-    gestureOutput.style.display = "none";
+    gestureOutput.style.display = Gestures.NONE;
+    lastGesture = "none";
   }
   // Call this function again to keep predicting when the browser is ready.
   if (webcamRunning === true) {

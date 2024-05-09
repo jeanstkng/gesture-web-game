@@ -1,17 +1,6 @@
 body {
   font-family: roboto;
-  margin: 2em;
   color: #3d3d3d;
-  --mdc-theme-primary: #007f8b;
-  --mdc-theme-on-primary: #f1f3f4;
-}
-
-h1 {
-  color: #007f8b;
-}
-
-h2 {
-  clear: both;
 }
 
 video {
@@ -43,13 +32,14 @@ section {
   margin: 2% 1%;
   cursor: pointer;
 }
+
 .videoView {
   position: absolute;
-  float: left;
   width: 48%;
-  margin: 2% 1%;
   cursor: pointer;
-  min-height: 500px;
+  min-height: 467px;
+  top: 12px;
+  left: 460px;
 }
 
 .videoView p,
@@ -90,8 +80,66 @@ section {
 .detectOnClick img {
   width: 45vw;
 }
+
 .output {
   display: none;
   width: 100%;
   font-size: calc(8px + 1.2vw);
+}
+
+.power-cooldown {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+}
+
+.power-cooldown img {
+  margin-left: 18px;
+  position: absolute;
+  top: -12px;
+}
+
+/* Timer from here */
+/* Sets the containers height and width */
+.base-timer {
+  position: absolute;
+  top: 24px;
+  left: 16px;
+  height: 36px;
+  width: 36px;
+}
+
+/* Removes SVG styling that would hide the time label */
+.base-timer__circle {
+  fill: none;
+  stroke: none;
+}
+
+/* The SVG path that displays the timer's progress */
+.base-timer__path-elapsed {
+  stroke-width: 18px;
+  stroke: rgb(121, 121, 121);
+}
+
+.base-timer__path-remaining {
+  /* Just as thick as the original ring */
+  stroke-width: 10px;
+
+  /* Rounds the line endings to create a seamless circle */
+  stroke-linecap: round;
+
+  /* Makes sure the animation starts at the top of the circle */
+  transform: rotate(90deg);
+  transform-origin: center;
+
+  /* One second aligns with the speed of the countdown timer */
+  transition: 100ms linear all;
+
+  /* Allows the ring to change color when the color value updates */
+  stroke: rgb(212, 0, 0);
+}
+
+.base-timer__svg {
+  /* Flips the svg and makes the animation to move left-to-right */
+  transform: scaleX(-1);
 }
