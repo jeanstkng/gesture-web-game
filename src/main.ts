@@ -3,6 +3,7 @@ import { loader } from "./resources";
 import { Player } from "./player";
 import { createGestureRecognizer, enableCam, hasGetUserMedia } from "./gesture";
 import { Background } from "./background";
+import { Enemy } from "./enemy";
 
 const game = new ex.Engine({
   width: 800,
@@ -11,15 +12,13 @@ const game = new ex.Engine({
   pixelArt: true,
   pixelRatio: 2,
   physics: {
-    solver: ex.SolverStrategy.Arcade
+    solver: ex.SolverStrategy.Arcade,
   },
 });
 
 createGestureRecognizer();
 
 game.start(loader).then(() => {
-  // If webcam supported, add event listener to button for when user
-  // wants to activate it.
   if (hasGetUserMedia()) {
     enableCam();
   } else {
@@ -28,9 +27,23 @@ game.start(loader).then(() => {
   }
 });
 
-const bg1 = new Background(new ex.Vector(400, 565), -400);
-const bg2 = new Background(new ex.Vector(1200, 565), 400);
+const bg1 = new Background(new ex.Vector(400, 565), -800);
+const bg2 = new Background(new ex.Vector(1200, 565), -800);
 const player = new Player(new ex.Vector(100, 528));
+
+const random = new ex.Random(1337);
+const timer = new ex.Timer({
+  random,
+  randomRange: [750, 1500],
+  interval: 1000,
+  repeats: true,
+  fcn: () => {
+    const enemy = new Enemy();
+    game.add(enemy);
+  },
+}).start();
+
+game.add(timer);
 
 game.add(player);
 game.add(bg1);

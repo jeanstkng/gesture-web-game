@@ -25,25 +25,15 @@ section {
   opacity: 0.2;
 }
 
-.detectOnClick {
-  position: relative;
-  float: left;
-  width: 48%;
-  margin: 2% 1%;
-  cursor: pointer;
-}
-
 .videoView {
   position: absolute;
   width: 48%;
-  cursor: pointer;
   min-height: 467px;
   top: 12px;
   left: 460px;
 }
 
-.videoView p,
-.detectOnClick p {
+.videoView p {
   padding-top: 5px;
   padding-bottom: 5px;
   background-color: #007f8b;
@@ -70,15 +60,6 @@ section {
   transform: rotateY(180deg);
   -webkit-transform: rotateY(180deg);
   -moz-transform: rotateY(180deg);
-}
-
-.detectOnClick {
-  z-index: 0;
-  font-size: calc(8px + 1.2vw);
-}
-
-.detectOnClick img {
-  width: 45vw;
 }
 
 .output {

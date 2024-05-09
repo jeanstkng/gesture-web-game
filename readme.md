@@ -15,3 +15,16 @@ Play sample [here](https://excaliburjs.com/sample-tiled-vite)
 
 * Run `npm run start` to produce javascript bundles for debugging in the `dist/` folder
 * Run `npm run build` to produce javascript bundles for production (minified) in the `dist/` folder
+
+# Research resources
+
+* https://blog.tensorflow.org/2021/11/3D-handpose.html
+* https://developers.google.com/mediapipe/solutions/vision/gesture_recognizer/web_js#video
+* https://developers.google.com/mediapipe/solutions/setup_web
+* https://developers.google.com/mediapipe/solutions/customization/gesture_recognizer
+
+Last link has a python notebook from google that you could use to train a new model.
+
+This could be done in python and make python recognize key press to play any game this way... But I am unsure why would you need it.
+
+* https://nitratine.net/blog/post/simulate-keypresses-in-python/

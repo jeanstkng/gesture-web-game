@@ -4,9 +4,7 @@ import { Config } from "./config";
 import { isPredictionsStarted } from "./gesture";
 
 export class Background extends Actor {
-  private initialPos = vec(0, 0);
   private resetAtX = 0;
-  private movementStarted = false;
 
   constructor(pos: ex.Vector, resetAtX: number) {
     super({
@@ -17,7 +15,6 @@ export class Background extends Actor {
       color: Color.Red,
     });
 
-    this.initialPos = pos;
     this.resetAtX = resetAtX;
   }
 
@@ -29,19 +26,14 @@ export class Background extends Actor {
     this.graphics.use(backgroundSprite);
   }
 
-  onPreUpdate(_engine: ex.Engine, _elapsedMs: number): void {
-    if (this.pos.x <= this.resetAtX) {
-      this.pos.x = this.initialPos.x;
+  onPreUpdate(_engine: ex.Engine, elapsedMs: number): void {
+    if (this.offset.x <= this.resetAtX) {
+      this.offset.x = 0;
     }
 
-    if (!this.movementStarted && isPredictionsStarted) {
-      this.startBgMovement();
+    if (isPredictionsStarted) {
+      this.offset.x -= Config.BackgroundSpeed * elapsedMs;
     }
   }
 
-  startBgMovement(): void {
-    this.vel = vec(-Config.BackgroundSpeed, 0);
-
-    this.movementStarted = true;
-  }
 }

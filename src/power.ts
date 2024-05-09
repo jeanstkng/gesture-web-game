@@ -8,6 +8,7 @@ import {
   Sprite,
   Engine,
   AnimationStrategy,
+  vec,
 } from "excalibur";
 import { Resources } from "./resources";
 import { Config } from "./config";
@@ -67,6 +68,7 @@ export class Power extends Actor {
 
     if (this.canAttack && lastGesture === Gestures.FOX) {
       this.actions.clearActions();
+      this.actions.moveBy(vec(10, -10), 100).moveBy(vec(0, 10), 100);
       this.dashArrayIncrement = 0;
       this.graphics.opacity = 1;
       this.canAttack = false;
