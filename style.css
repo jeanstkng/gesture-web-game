@@ -74,6 +74,20 @@ section {
   left: 24px;
 }
 
+.attack-cooldown {
+  position: absolute;
+  top: 24px;
+  left: 76px;
+}
+
+.jump-cooldown {
+  position: absolute;
+  top: 24px;
+  left: 128px;
+}
+
+.jump-cooldown img,
+.attack-cooldown img,
 .power-cooldown img {
   margin-left: 18px;
   position: absolute;
@@ -123,4 +137,8 @@ section {
 .base-timer__svg {
   /* Flips the svg and makes the animation to move left-to-right */
   transform: scaleX(-1);
+}
+
+#powers {
+  visibility: hidden;
 }

@@ -4,35 +4,91 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gesture Game</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sedan+SC&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
     <canvas id="game"></canvas>
-    <div class="power-cooldown">
-      <image width="32" src="./img/kon.png"/>
-      <div class="base-timer">
-        <svg
-          class="base-timer__svg"
-          viewBox="0 0 100 100"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <g class="base-timer__circle">
-            <circle class="base-timer__path-elapsed" cx="50" cy="50" r="40" />
-            <path
-              id="base-timer-path-remaining"
-              stroke-dasharray="283 283"
-              class="base-timer__path-remaining red"
-              d="
-                  M 50, 50
-                  m -45, 0
-                  a 30,30 0 1,0 90,0
-                  a 30,30 0 1,0 -90,0
-              "
-            ></path>
-          </g>
-        </svg>
+    <section id="powers">
+      <div class="power-cooldown">
+        <image width="32" src="./img/kon.png" />
+        <div class="base-timer">
+          <svg
+            class="base-timer__svg"
+            viewBox="0 0 100 100"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <g class="base-timer__circle">
+              <circle class="base-timer__path-elapsed" cx="50" cy="50" r="40" />
+              <path
+                id="base-timer-path-remaining"
+                stroke-dasharray="283 283"
+                class="base-timer__path-remaining red"
+                d="
+                    M 50, 50
+                    m -45, 0
+                    a 30,30 0 1,0 90,0
+                    a 30,30 0 1,0 -90,0
+                "
+              ></path>
+            </g>
+          </svg>
+        </div>
       </div>
-    </div>
+      <div class="attack-cooldown">
+        <image width="32" src="./img/peace.png" />
+        <div class="base-timer">
+          <svg
+            class="base-timer__svg"
+            viewBox="0 0 100 100"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <g class="base-timer__circle">
+              <circle class="base-timer__path-elapsed" cx="50" cy="50" r="40" />
+              <path
+                id="base-timer-path-remaining-1"
+                stroke-dasharray="283 283"
+                class="base-timer__path-remaining red"
+                d="
+                    M 50, 50
+                    m -45, 0
+                    a 30,30 0 1,0 90,0
+                    a 30,30 0 1,0 -90,0
+                "
+              ></path>
+            </g>
+          </svg>
+        </div>
+      </div>
+      <div class="jump-cooldown">
+        <image width="32" src="./img/rock.png" />
+        <div class="base-timer">
+          <svg
+            class="base-timer__svg"
+            viewBox="0 0 100 100"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <g class="base-timer__circle">
+              <circle class="base-timer__path-elapsed" cx="50" cy="50" r="40" />
+              <path
+                id="base-timer-path-remaining-2"
+                stroke-dasharray="283 283"
+                class="base-timer__path-remaining red"
+                d="
+                    M 50, 50
+                    m -45, 0
+                    a 30,30 0 1,0 90,0
+                    a 30,30 0 1,0 -90,0
+                "
+              ></path>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </section>
 
     <div id="liveView" class="videoView">
       <div style="position: relative">

@@ -111,12 +111,12 @@ async function predictWebcam() {
         GestureRecognizer.HAND_CONNECTIONS,
         {
           color: "#00FF00",
-          lineWidth: 5,
+          lineWidth: 2.5,
         }
       );
       drawingUtils.drawLandmarks(landmarks, {
         color: "#FF0000",
-        lineWidth: 2,
+        lineWidth: 0.5,
       });
     }
   }
@@ -128,7 +128,7 @@ async function predictWebcam() {
     const categoryScore = (results.gestures[0][0].score * 100).toFixed(2);
     const handedness = results.handedness[0][0].displayName;
     gestureOutput.innerText = `GestureRecognizer: ${categoryName}\n Confidence: ${categoryScore} %\n Handedness: ${handedness}`;
-    if (+categoryScore >= 60) {
+    if (+categoryScore >= 50) {
       lastGesture = categoryName.toLowerCase();
     }
   } else {

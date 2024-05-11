@@ -11,8 +11,12 @@ const game = new ex.Engine({
   canvasElementId: "game",
   pixelArt: true,
   pixelRatio: 2,
+  fixedUpdateFps: 60,
+  // Turn off anti-aliasing for pixel art graphics
+  antialiasing: false,
   physics: {
     solver: ex.SolverStrategy.Arcade,
+    gravity: ex.vec(0, 800),
   },
 });
 
@@ -25,6 +29,8 @@ game.start(loader).then(() => {
     alert("Your browser does not support webcam usage");
     console.warn("getUserMedia() is not supported by your browser");
   }
+
+  document.getElementById("powers")!.style.visibility = "visible";
 });
 
 const bg1 = new Background(new ex.Vector(400, 565), -800);

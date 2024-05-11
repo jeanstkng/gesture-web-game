@@ -1,41 +1,66 @@
 import {
   Actor,
   Animation,
+  AnimationStrategy,
   CollisionType,
+  Color,
+  EmitterType,
   Engine,
+  EventEmitter,
   ImageSource,
+  ParticleEmitter,
   Random,
+  Scene,
+  Side,
   Sprite,
   SpriteSheet,
+  Vector,
   vec,
 } from "excalibur";
 import { Resources } from "./resources";
 import { Config } from "./config";
+import { gameState } from "./gameState";
 
 export class Enemy extends Actor {
-  private cooldown: number = 1500;
-  private timer: number = 0;
-  private canAttack: boolean = true;
   private goblinRunAnim?: Animation;
+  private goblinAttackAnim?: Animation;
   private skeletonRunAnim?: Animation;
+  private skeletonAttackAnim?: Animation;
   private mushroomRunAnim?: Animation;
+  private mushroomAttackAnim?: Animation;
   private flyingEyeRunAnim?: Animation;
+  private flyingEyeAttackAnim?: Animation;
   private startMoving: boolean = false;
+  private engine?: Engine;
+  private enemyType: string = "";
+  private playerTouched: boolean = false;
+  private isDead: boolean = false;
 
   constructor() {
     super({
       pos: vec(900, 500),
-      width: 150,
-      height: 150,
+      width: 32,
+      height: 64,
       collisionType: CollisionType.Passive,
       scale: vec(1.5, 1.5),
       name: "enemy",
+      color: Color.Red,
     });
   }
 
-  onInitialize(_engine: ex.Engine): void {
+  onInitialize(engine: ex.Engine): void {
+    this.engine = engine;
     const goblinRunSpriteSheet = SpriteSheet.fromImageSource({
       image: Resources.GoblinRunSpriteSheetPng as ImageSource,
+      grid: {
+        spriteWidth: 150,
+        spriteHeight: 150,
+        rows: 1,
+        columns: 8,
+      },
+    });
+    const goblinAttackSpriteSheet = SpriteSheet.fromImageSource({
+      image: Resources.GoblinAttackSpriteSheetPng as ImageSource,
       grid: {
         spriteWidth: 150,
         spriteHeight: 150,
@@ -52,6 +77,15 @@ export class Enemy extends Actor {
         columns: 4,
       },
     });
+    const skeletonAttackSpriteSheet = SpriteSheet.fromImageSource({
+      image: Resources.SkeletonAttackSpriteSheetPng as ImageSource,
+      grid: {
+        spriteWidth: 150,
+        spriteHeight: 150,
+        rows: 1,
+        columns: 8,
+      },
+    });
     const flyingEyeRunSpriteSheet = SpriteSheet.fromImageSource({
       image: Resources.FlyingEyeRunSpriteSheetPng as ImageSource,
       grid: {
@@ -61,8 +95,26 @@ export class Enemy extends Actor {
         columns: 8,
       },
     });
+    const flyingEyeAttackSpriteSheet = SpriteSheet.fromImageSource({
+      image: Resources.FlyingEyeAttackSpriteSheetPng as ImageSource,
+      grid: {
+        spriteWidth: 150,
+        spriteHeight: 150,
+        rows: 1,
+        columns: 8,
+      },
+    });
     const mushroomRunSpriteSheet = SpriteSheet.fromImageSource({
       image: Resources.MushroomRunSpriteSheetPng as ImageSource,
+      grid: {
+        spriteWidth: 150,
+        spriteHeight: 150,
+        rows: 1,
+        columns: 8,
+      },
+    });
+    const mushroomAttackSpriteSheet = SpriteSheet.fromImageSource({
+      image: Resources.MushroomAttackSpriteSheetPng as ImageSource,
       grid: {
         spriteWidth: 150,
         spriteHeight: 150,
@@ -108,6 +160,44 @@ export class Enemy extends Actor {
       ],
     });
 
+    this.goblinAttackAnim = new Animation({
+      frames: [
+        {
+          graphic: goblinAttackSpriteSheet.getSprite(0, 0) as Sprite,
+          duration: Config.GoblinFrameSpeed,
+        },
+        {
+          graphic: goblinAttackSpriteSheet.getSprite(1, 0) as Sprite,
+          duration: Config.GoblinFrameSpeed,
+        },
+        {
+          graphic: goblinAttackSpriteSheet.getSprite(2, 0) as Sprite,
+          duration: Config.GoblinFrameSpeed,
+        },
+        {
+          graphic: goblinAttackSpriteSheet.getSprite(3, 0) as Sprite,
+          duration: Config.GoblinFrameSpeed,
+        },
+        {
+          graphic: goblinAttackSpriteSheet.getSprite(4, 0) as Sprite,
+          duration: Config.GoblinFrameSpeed,
+        },
+        {
+          graphic: goblinAttackSpriteSheet.getSprite(5, 0) as Sprite,
+          duration: Config.GoblinFrameSpeed,
+        },
+        {
+          graphic: goblinAttackSpriteSheet.getSprite(6, 0) as Sprite,
+          duration: Config.GoblinFrameSpeed,
+        },
+        {
+          graphic: goblinAttackSpriteSheet.getSprite(7, 0) as Sprite,
+          duration: Config.GoblinFrameSpeed,
+        },
+      ],
+      strategy: AnimationStrategy.Freeze,
+    });
+
     this.skeletonRunAnim = new Animation({
       frames: [
         {
@@ -127,6 +217,44 @@ export class Enemy extends Actor {
           duration: Config.GoblinFrameSpeed,
         },
       ],
+    });
+
+    this.skeletonAttackAnim = new Animation({
+      frames: [
+        {
+          graphic: skeletonAttackSpriteSheet.getSprite(0, 0) as Sprite,
+          duration: Config.GoblinFrameSpeed,
+        },
+        {
+          graphic: skeletonAttackSpriteSheet.getSprite(1, 0) as Sprite,
+          duration: Config.GoblinFrameSpeed,
+        },
+        {
+          graphic: skeletonAttackSpriteSheet.getSprite(2, 0) as Sprite,
+          duration: Config.GoblinFrameSpeed,
+        },
+        {
+          graphic: skeletonAttackSpriteSheet.getSprite(3, 0) as Sprite,
+          duration: Config.GoblinFrameSpeed,
+        },
+        {
+          graphic: skeletonAttackSpriteSheet.getSprite(4, 0) as Sprite,
+          duration: Config.GoblinFrameSpeed,
+        },
+        {
+          graphic: skeletonAttackSpriteSheet.getSprite(5, 0) as Sprite,
+          duration: Config.GoblinFrameSpeed,
+        },
+        {
+          graphic: skeletonAttackSpriteSheet.getSprite(6, 0) as Sprite,
+          duration: Config.GoblinFrameSpeed,
+        },
+        {
+          graphic: skeletonAttackSpriteSheet.getSprite(7, 0) as Sprite,
+          duration: Config.GoblinFrameSpeed,
+        },
+      ],
+      strategy: AnimationStrategy.Freeze,
     });
 
     this.mushroomRunAnim = new Animation({
@@ -166,6 +294,44 @@ export class Enemy extends Actor {
       ],
     });
 
+    this.mushroomAttackAnim = new Animation({
+      frames: [
+        {
+          graphic: mushroomAttackSpriteSheet.getSprite(0, 0) as Sprite,
+          duration: Config.GoblinFrameSpeed,
+        },
+        {
+          graphic: mushroomAttackSpriteSheet.getSprite(1, 0) as Sprite,
+          duration: Config.GoblinFrameSpeed,
+        },
+        {
+          graphic: mushroomAttackSpriteSheet.getSprite(2, 0) as Sprite,
+          duration: Config.GoblinFrameSpeed,
+        },
+        {
+          graphic: mushroomAttackSpriteSheet.getSprite(3, 0) as Sprite,
+          duration: Config.GoblinFrameSpeed,
+        },
+        {
+          graphic: mushroomAttackSpriteSheet.getSprite(4, 0) as Sprite,
+          duration: Config.GoblinFrameSpeed,
+        },
+        {
+          graphic: mushroomAttackSpriteSheet.getSprite(5, 0) as Sprite,
+          duration: Config.GoblinFrameSpeed,
+        },
+        {
+          graphic: mushroomAttackSpriteSheet.getSprite(6, 0) as Sprite,
+          duration: Config.GoblinFrameSpeed,
+        },
+        {
+          graphic: mushroomAttackSpriteSheet.getSprite(7, 0) as Sprite,
+          duration: Config.GoblinFrameSpeed,
+        },
+      ],
+      strategy: AnimationStrategy.Freeze,
+    });
+
     this.flyingEyeRunAnim = new Animation({
       frames: [
         {
@@ -203,25 +369,77 @@ export class Enemy extends Actor {
       ],
     });
 
+    this.flyingEyeAttackAnim = new Animation({
+      frames: [
+        {
+          graphic: flyingEyeAttackSpriteSheet.getSprite(0, 0) as Sprite,
+          duration: Config.GoblinFrameSpeed,
+        },
+        {
+          graphic: flyingEyeAttackSpriteSheet.getSprite(1, 0) as Sprite,
+          duration: Config.GoblinFrameSpeed,
+        },
+        {
+          graphic: flyingEyeAttackSpriteSheet.getSprite(2, 0) as Sprite,
+          duration: Config.GoblinFrameSpeed,
+        },
+        {
+          graphic: flyingEyeAttackSpriteSheet.getSprite(3, 0) as Sprite,
+          duration: Config.GoblinFrameSpeed,
+        },
+        {
+          graphic: flyingEyeAttackSpriteSheet.getSprite(4, 0) as Sprite,
+          duration: Config.GoblinFrameSpeed,
+        },
+        {
+          graphic: flyingEyeAttackSpriteSheet.getSprite(5, 0) as Sprite,
+          duration: Config.GoblinFrameSpeed,
+        },
+        {
+          graphic: flyingEyeAttackSpriteSheet.getSprite(6, 0) as Sprite,
+          duration: Config.GoblinFrameSpeed,
+        },
+        {
+          graphic: flyingEyeAttackSpriteSheet.getSprite(7, 0) as Sprite,
+          duration: Config.GoblinFrameSpeed,
+        },
+      ],
+      strategy: AnimationStrategy.Freeze,
+    });
+
     this.graphics.add("goblin-run", this.goblinRunAnim);
+    this.graphics.add("goblin-attack", this.goblinAttackAnim);
     this.graphics.add("skeleton-run", this.skeletonRunAnim);
+    this.graphics.add("skeleton-attack", this.skeletonAttackAnim);
     this.graphics.add("mushroom-run", this.mushroomRunAnim);
+    this.graphics.add("mushroom-attack", this.mushroomAttackAnim);
     this.graphics.add("flyingeye-run", this.flyingEyeRunAnim);
+    this.graphics.add("flyingeye-attack", this.flyingEyeAttackAnim);
 
     const enemies = ["goblin", "skeleton", "mushroom", "flyingeye"];
 
     const random = new Random();
-
-    this.graphics.use(`${random.pickOne(enemies)}-run`);
+    this.enemyType = random.pickOne(enemies);
+    this.graphics.use(`${this.enemyType}-run`);
     this.graphics.flipHorizontal = true;
+
+    this.on("collisionstart", (event) => {
+      if (event.other.name === "player" && event.side == Side.Left) {
+        this.playerTouched = true;
+        engine.clock.schedule(() => {
+          !this.isDead && this.graphics.use(`${this.enemyType}-attack`);
+        }, 300);
+        engine.clock.schedule(() => {
+          !this.isDead && (gameState.isDead = true);
+        }, 1000);
+      }
+    });
   }
 
-  onPreUpdate(_engine: Engine, elapsedMs: number): void {
-    if (this.timer >= this.cooldown && !this.canAttack) {
-      this.timer = 0;
-      this.canAttack = true;
-    } else if (this.timer <= this.cooldown) {
-      this.timer += elapsedMs;
+  onPreUpdate(_engine: Engine, _elapsedMs: number): void {
+    if (gameState.isDead || this.playerTouched) {
+      this.vel.x = 0;
+      return;
     }
 
     if (this.pos.x <= -100) {
@@ -232,5 +450,35 @@ export class Enemy extends Actor {
       this.vel.x = -100;
       this.startMoving = true;
     }
+  }
+
+  onPreKill(scene: Scene<unknown>): void {
+    this.isDead = true;
+    const emitter = new ParticleEmitter({
+      x: this.pos.x,
+      y: this.pos.y,
+    });
+    emitter.emitterType = EmitterType.Circle;
+    emitter.radius = 5;
+    emitter.minVel = 100;
+    emitter.maxVel = 200;
+    emitter.minAngle = 0;
+    emitter.maxAngle = 6.2;
+    emitter.isEmitting = true;
+    emitter.emitRate = 100;
+    emitter.opacity = 0.5;
+    emitter.fadeFlag = false;
+    emitter.particleLife = 500;
+    emitter.maxSize = 4;
+    emitter.minSize = 1;
+    emitter.startSize = 0;
+    emitter.endSize = 0;
+    emitter.acceleration = new Vector(0, 800);
+    emitter.beginColor = Color.Red;
+    emitter.endColor = Color.Red;
+    scene.add(emitter);
+    this.engine?.clock.schedule(() => {
+      emitter.kill();
+    }, 500);
   }
 }

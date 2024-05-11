@@ -2,6 +2,7 @@ import { Actor, CollisionType, Color, Sprite, vec } from "excalibur";
 import { Resources } from "./resources";
 import { Config } from "./config";
 import { isPredictionsStarted } from "./gesture";
+import { gameState } from "./gameState";
 
 export class Background extends Actor {
   private resetAtX = 0;
@@ -31,7 +32,7 @@ export class Background extends Actor {
       this.offset.x = 0;
     }
 
-    if (isPredictionsStarted) {
+    if (isPredictionsStarted && !gameState.isDead) {
       this.offset.x -= Config.BackgroundSpeed * elapsedMs;
     }
   }

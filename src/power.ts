@@ -9,6 +9,7 @@ import {
   Engine,
   AnimationStrategy,
   vec,
+  Color,
 } from "excalibur";
 import { Resources } from "./resources";
 import { Config } from "./config";
@@ -20,15 +21,18 @@ export class Power extends Actor {
   private canAttack: boolean = true;
   private wolfAnimation?: Animation;
   private dashArrayIncrement: number = 283;
+  private actualEnemiesCollision: number[] = [];
+  private initialPos?: Vector;
 
   constructor(pos: Vector) {
     super({
       pos,
       width: 256,
       height: 256,
-      collisionType: CollisionType.Active,
+      collisionType: CollisionType.Passive,
       name: "kon",
     });
+    this.initialPos = pos;
   }
 
   onInitialize(_engine: ex.Engine): void {
@@ -56,6 +60,21 @@ export class Power extends Actor {
       strategy: AnimationStrategy.Freeze,
     });
     this.graphics.add("wolf-attack", this.wolfAnimation);
+
+    this.on("collisionstart", (event) => {
+      if (event.other.name === "enemy") {
+        console.log(event.other.id, "evento en power in");
+        this.actualEnemiesCollision.push(event.other.id);
+      }
+    });
+    this.on("collisionend", (event) => {
+      if (event.other.name === "enemy") {
+        console.log(event.other.id, "evento en power out");
+        this.actualEnemiesCollision = this.actualEnemiesCollision.filter(
+          (id) => event.other.id !== id
+        );
+      }
+    });
   }
 
   onPreUpdate(engine: Engine, elapsedMs: number): void {
@@ -67,6 +86,7 @@ export class Power extends Actor {
     }
 
     if (this.canAttack && lastGesture === Gestures.FOX) {
+      this.pos = this.initialPos!;
       this.actions.clearActions();
       this.actions.moveBy(vec(10, -10), 100).moveBy(vec(0, 10), 100);
       this.dashArrayIncrement = 0;
@@ -74,6 +94,14 @@ export class Power extends Actor {
       this.canAttack = false;
       this.wolfAnimation?.reset();
       this.graphics.use("wolf-attack");
+      this.scene?.actors.map((actor) => {
+        if (this.actualEnemiesCollision.includes(actor.id)) {
+          actor.kill();
+          this.actualEnemiesCollision = this.actualEnemiesCollision.filter(
+            (id) => actor.id !== id
+          );
+        }
+      });
       engine.clock.schedule(() => {
         this.actions.fade(0, 100);
       }, 600);

@@ -1,151 +1,152 @@
-import * as ex from "excalibur";
-import { Resources } from "./resources";
+import {
+  playerAttackSpriteSheet,
+  playerDeathSpriteSheet,
+  playerFallSpriteSheet,
+  playerIdleSpriteSheet,
+  playerJumpSpriteSheet,
+  playerRunSpriteSheet,
+} from "./resources";
 import { Config } from "./config";
 import { Gestures, isPredictionsStarted, lastGesture } from "./gesture";
 import { Power } from "./power";
+import { gameState } from "./gameState";
+import {
+  Actor,
+  Animation,
+  AnimationStrategy,
+  CollisionType,
+  Color,
+  Engine,
+  Font,
+  FontUnit,
+  Label,
+  PostCollisionEvent,
+  Side,
+  Vector,
+  vec,
+} from "excalibur";
 
-export class Player extends ex.Actor {
+export class Player extends Actor {
   private cooldown: number = 1000;
   private timer: number = 0;
-  private timerb: number = 0;
+  private jumpTimer: number = 0;
   private canAttack: boolean = true;
-  private wolfAttack: Power = new Power(
-    ex.vec(this.pos.x + 128, this.pos.y - 92)
-  );
+  private wolfAttack: Power = new Power(vec(this.pos.x + 164, this.pos.y - 92));
   private isAttacking: boolean = false;
-  private attack?: ex.Animation;
+  private attack?: Animation;
+  private jump?: Animation;
+  private fall?: Animation;
+  private actualEnemiesCollision: number[] = [];
+  private dashArrayIncrements = {
+    [1]: 283,
+    [2]: 283,
+  };
+  private canJump: boolean = true;
+  private onGround: boolean = true;
+  private scoreLabel?: Label;
+  private score: number = 0;
 
-  constructor(pos: ex.Vector) {
+  constructor(pos: Vector) {
     super({
       pos,
       width: 64,
-      height: 64,
-      collisionType: ex.CollisionType.Active,
-      color: ex.Color.Black,
-      scale: ex.vec(1.5, 1.5),
+      height: 96,
+      collisionType: CollisionType.Active,
+      name: "player",
+      color: Color.Green,
     });
   }
 
-  onInitialize(engine: ex.Engine): void {
-    const playerRunSpriteSheet = ex.SpriteSheet.fromImageSource({
-      image: Resources.HeroRunSpriteSheetPng as ex.ImageSource,
-      grid: {
-        spriteWidth: 200,
-        spriteHeight: 200,
-        rows: 1,
-        columns: 8,
-      },
+  onInitialize(engine: Engine): void {
+    const font = new Font({
+      family: "Sedan SC",
+      size: 24,
+      unit: FontUnit.Px,
     });
 
-    const playerIdleSpriteSheet = ex.SpriteSheet.fromImageSource({
-      image: Resources.HeroIdleSpriteSheetPng as ex.ImageSource,
-      grid: {
-        spriteWidth: 200,
-        spriteHeight: 200,
-        rows: 1,
-        columns: 4,
-      },
+    this.scoreLabel = new Label({
+      text: "Score: 0",
+      pos: vec(200, 24),
+      font,
+      color: Color.White,
     });
 
-    const playerAttackSpriteSheet = ex.SpriteSheet.fromImageSource({
-      image: Resources.HeroAttackSpriteSheetPng as ex.ImageSource,
-      grid: {
-        spriteWidth: 200,
-        spriteHeight: 200,
-        rows: 1,
-        columns: 4,
-      },
-    });
+    engine.add(this.scoreLabel);
 
-    const rightWalk = new ex.Animation({
-      frames: [
-        {
-          graphic: playerRunSpriteSheet.getSprite(0, 0) as ex.Sprite,
-          duration: Config.PlayerFrameSpeed,
-        },
-        {
-          graphic: playerRunSpriteSheet.getSprite(1, 0) as ex.Sprite,
-          duration: Config.PlayerFrameSpeed,
-        },
-        {
-          graphic: playerRunSpriteSheet.getSprite(2, 0) as ex.Sprite,
-          duration: Config.PlayerFrameSpeed,
-        },
-        {
-          graphic: playerRunSpriteSheet.getSprite(3, 0) as ex.Sprite,
-          duration: Config.PlayerFrameSpeed,
-        },
-        {
-          graphic: playerRunSpriteSheet.getSprite(4, 0) as ex.Sprite,
-          duration: Config.PlayerFrameSpeed,
-        },
-        {
-          graphic: playerRunSpriteSheet.getSprite(5, 0) as ex.Sprite,
-          duration: Config.PlayerFrameSpeed,
-        },
-        {
-          graphic: playerRunSpriteSheet.getSprite(6, 0) as ex.Sprite,
-          duration: Config.PlayerFrameSpeed,
-        },
-        {
-          graphic: playerRunSpriteSheet.getSprite(7, 0) as ex.Sprite,
-          duration: Config.PlayerFrameSpeed,
-        },
-      ],
-    });
+    const rightWalk = Animation.fromSpriteSheet(
+      playerRunSpriteSheet,
+      [0, 1, 2, 3, 4, 5, 6, 7],
+      Config.PlayerFrameSpeed
+    );
+    rightWalk.scale = vec(1.5, 1.5);
+
+    const rightIdle = Animation.fromSpriteSheet(
+      playerIdleSpriteSheet,
+      [0, 1, 2, 3],
+      Config.PlayerFrameSpeed
+    );
+    rightIdle.scale = vec(1.5, 1.5);
+
+    this.attack = Animation.fromSpriteSheet(
+      playerAttackSpriteSheet,
+      [0, 1, 2, 3],
+      Config.PlayerFrameSpeed,
+      AnimationStrategy.Freeze
+    );
+    this.attack.scale = vec(1.5, 1.5);
+
+    this.jump = Animation.fromSpriteSheet(
+      playerJumpSpriteSheet,
+      [0, 1],
+      Config.PlayerFrameSpeed,
+      AnimationStrategy.Freeze
+    );
+    this.jump.scale = vec(1.5, 1.5);
+
+    this.fall = Animation.fromSpriteSheet(
+      playerFallSpriteSheet,
+      [0, 1],
+      Config.PlayerFrameSpeed,
+      AnimationStrategy.Freeze
+    );
+    this.fall.scale = vec(1.5, 1.5);
+
+    const death = Animation.fromSpriteSheet(
+      playerDeathSpriteSheet,
+      [0, 1, 2, 3, 4, 5, 6],
+      Config.PlayerFrameSpeed,
+      AnimationStrategy.Freeze
+    );
+    death.scale = vec(1.5, 1.5);
+
     this.graphics.add("right-walk", rightWalk);
-
-    const rightIdle = new ex.Animation({
-      frames: [
-        {
-          graphic: playerIdleSpriteSheet.getSprite(0, 0) as ex.Sprite,
-          duration: Config.PlayerFrameSpeed,
-        },
-        {
-          graphic: playerIdleSpriteSheet.getSprite(1, 0) as ex.Sprite,
-          duration: Config.PlayerFrameSpeed,
-        },
-        {
-          graphic: playerIdleSpriteSheet.getSprite(2, 0) as ex.Sprite,
-          duration: Config.PlayerFrameSpeed,
-        },
-        {
-          graphic: playerIdleSpriteSheet.getSprite(3, 0) as ex.Sprite,
-          duration: Config.PlayerFrameSpeed,
-        },
-      ],
-    });
     this.graphics.add("right-idle", rightIdle);
-
-    this.attack = new ex.Animation({
-      frames: [
-        {
-          graphic: playerAttackSpriteSheet.getSprite(0, 0) as ex.Sprite,
-          duration: Config.PlayerFrameSpeed,
-        },
-        {
-          graphic: playerAttackSpriteSheet.getSprite(1, 0) as ex.Sprite,
-          duration: Config.PlayerFrameSpeed,
-        },
-        {
-          graphic: playerAttackSpriteSheet.getSprite(2, 0) as ex.Sprite,
-          duration: Config.PlayerFrameSpeed,
-        },
-        {
-          graphic: playerAttackSpriteSheet.getSprite(3, 0) as ex.Sprite,
-          duration: Config.PlayerFrameSpeed,
-        },
-      ],
-      strategy: ex.AnimationStrategy.Freeze,
-    });
     this.graphics.add("attack", this.attack);
+    this.graphics.add("jump", this.jump);
+    this.graphics.add("fall", this.fall);
+    this.graphics.add("death", death);
 
     this.graphics.offset.y = 8;
 
     engine.add(this.wolfAttack);
+
+    this.on("collisionstart", (event) => {
+      if (event.other.name === "enemy")
+        this.actualEnemiesCollision.push(event.other.id);
+    });
+    this.on("postcollision", (evt) => this.onPostCollision(evt));
   }
 
-  onPreUpdate(engine: ex.Engine, elapsedMs: number): void {
+  onPostCollision(evt: PostCollisionEvent) {
+    if (evt.side === Side.Bottom) this.onGround = true;
+  }
+
+  onPreUpdate(engine: Engine, elapsedMs: number): void {
+    if (gameState.isDead) {
+      this.graphics.use("death");
+      return;
+    }
+
     if (this.timer >= this.cooldown && !this.canAttack) {
       this.timer = 0;
       this.canAttack = true;
@@ -153,7 +154,14 @@ export class Player extends ex.Actor {
       this.timer += elapsedMs;
     }
 
-    if (!this.isAttacking) {
+    if (this.jumpTimer >= this.cooldown && !this.canJump) {
+      this.jumpTimer = 0;
+      this.canJump = true;
+    } else if (this.jumpTimer <= this.cooldown) {
+      this.jumpTimer += elapsedMs;
+    }
+
+    if (!this.isAttacking && this.onGround) {
       this.graphics.use("right-idle");
     }
 
@@ -162,19 +170,76 @@ export class Player extends ex.Actor {
       !this.isAttacking &&
       lastGesture === Gestures.SCISSORS
     ) {
-
+      this.dashArrayIncrements[1] = 0;
       this.timer = 0;
       this.canAttack = false;
       this.isAttacking = true;
       this.attack?.reset();
       this.graphics.use("attack");
+
+      engine.clock.schedule(() => {
+        this.scene?.actors.map((actor) => {
+          if (this.actualEnemiesCollision.includes(actor.id)) {
+            this.score += 10;
+            this.scoreLabel!.text = `Score: ${this.score}`;
+            actor.kill();
+            this.actualEnemiesCollision = this.actualEnemiesCollision.filter(
+              (id) => actor.id !== id
+            );
+          }
+        });
+      }, 200);
       engine.clock.schedule(() => {
         this.isAttacking = false;
       }, 400);
     }
 
-    if (isPredictionsStarted && !this.isAttacking) {
+    if (
+      this.canJump &&
+      !this.isAttacking &&
+      this.onGround &&
+      lastGesture === Gestures.ROCK
+    ) {
+      this.dashArrayIncrements[2] = 0;
+      this.jumpTimer = 0;
+      this.canJump = false;
+      this.onGround = false;
+      this.jump?.reset();
+      this.fall?.reset();
+      this.graphics.use("jump");
+      this.vel.y = -600;
+
+      engine.clock.schedule(() => {
+        this.graphics.use("fall");
+      }, 200);
+    }
+
+    if (isPredictionsStarted && !this.isAttacking && this.onGround) {
       this.graphics.use("right-walk");
     }
+
+    this.setCircleDasharray(1, this.timer);
+    this.setCircleDasharray(2, this.jumpTimer);
+  }
+
+  calculateTimeFraction(timeLeft: number, timeLimit: number) {
+    const rawTimeFraction = timeLeft / timeLimit;
+    return rawTimeFraction - (1 / timeLimit) * (1 - rawTimeFraction);
+  }
+
+  setCircleDasharray(circleId: 1 | 2, timer: number) {
+    const FULL_DASH_ARRAY = 283;
+
+    if (this.dashArrayIncrements[circleId] < FULL_DASH_ARRAY) {
+      this.dashArrayIncrements[circleId] =
+        this.calculateTimeFraction(timer, this.cooldown) * FULL_DASH_ARRAY;
+    }
+    const circleDasharray = `${this.dashArrayIncrements[circleId].toFixed(
+      0
+    )} 283`;
+
+    document
+      .getElementById(`base-timer-path-remaining-${circleId}`)!
+      .setAttribute("stroke-dasharray", circleDasharray);
   }
 }
