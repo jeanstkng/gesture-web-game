@@ -3,5 +3,5 @@ export const Config = {
     PlayerFrameSpeed: 100, // ms
     WolfFrame1Speed: 200, // ms
     WolfFrame2Speed: 400, // ms
-    GoblinFrameSpeed: 100, // ms
+    EnemyFrameSpeed: 100, // ms
 }

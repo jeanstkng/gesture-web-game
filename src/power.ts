@@ -14,13 +14,14 @@ import {
 import { Resources } from "./resources";
 import { Config } from "./config";
 import { Gestures, lastGesture } from "./gesture";
+import { gameState } from "./gameState";
 
 export class Power extends Actor {
   private cooldown: number = 2500;
   private timer: number = 0;
   private canAttack: boolean = true;
-  private wolfAnimation?: Animation;
   private dashArrayIncrement: number = 283;
+  private wolfAnimation?: Animation;
   private actualEnemiesCollision: number[] = [];
   private initialPos?: Vector;
 
@@ -78,6 +79,8 @@ export class Power extends Actor {
   }
 
   onPreUpdate(engine: Engine, elapsedMs: number): void {
+    if (gameState.isDead) return;
+
     if (this.timer >= this.cooldown && !this.canAttack) {
       this.timer = 0;
       this.canAttack = true;
@@ -127,5 +130,11 @@ export class Power extends Actor {
     document
       .getElementById("base-timer-path-remaining")!
       .setAttribute("stroke-dasharray", circleDasharray);
+  }
+
+  resetWolf() {
+    this.timer = 0;
+    this.canAttack = true;
+    this.dashArrayIncrement = 283;
   }
 }

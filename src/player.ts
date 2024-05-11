@@ -31,11 +31,12 @@ export class Player extends Actor {
   private timer: number = 0;
   private jumpTimer: number = 0;
   private canAttack: boolean = true;
-  private wolfAttack: Power = new Power(vec(this.pos.x + 164, this.pos.y - 92));
   private isAttacking: boolean = false;
+  private wolfAttack: Power = new Power(vec(this.pos.x + 164, this.pos.y - 92));
   private attack?: Animation;
   private jump?: Animation;
   private fall?: Animation;
+  private death?: Animation;
   private actualEnemiesCollision: number[] = [];
   private dashArrayIncrements = {
     [1]: 283,
@@ -53,7 +54,6 @@ export class Player extends Actor {
       height: 96,
       collisionType: CollisionType.Active,
       name: "player",
-      color: Color.Green,
     });
   }
 
@@ -111,20 +111,20 @@ export class Player extends Actor {
     );
     this.fall.scale = vec(1.5, 1.5);
 
-    const death = Animation.fromSpriteSheet(
+    this.death = Animation.fromSpriteSheet(
       playerDeathSpriteSheet,
       [0, 1, 2, 3, 4, 5, 6],
       Config.PlayerFrameSpeed,
       AnimationStrategy.Freeze
     );
-    death.scale = vec(1.5, 1.5);
+    this.death.scale = vec(1.5, 1.5);
 
     this.graphics.add("right-walk", rightWalk);
     this.graphics.add("right-idle", rightIdle);
     this.graphics.add("attack", this.attack);
     this.graphics.add("jump", this.jump);
     this.graphics.add("fall", this.fall);
-    this.graphics.add("death", death);
+    this.graphics.add("death", this.death);
 
     this.graphics.offset.y = 8;
 
@@ -241,5 +241,25 @@ export class Player extends Actor {
     document
       .getElementById(`base-timer-path-remaining-${circleId}`)!
       .setAttribute("stroke-dasharray", circleDasharray);
+  }
+
+  resetPlayer() {
+    this.dashArrayIncrements = {
+      [1]: 283,
+      [2]: 283,
+    };
+    this.canJump = true;
+    this.onGround = true;
+    this.score = 0;
+    this.timer = 0;
+    this.jumpTimer = 0;
+    this.canAttack = true;
+    this.isAttacking = false;
+    this.attack?.reset();
+    this.jump?.reset();
+    this.fall?.reset();
+    this.death?.reset();
+    this.actualEnemiesCollision = [];
+    this.wolfAttack.resetWolf();
   }
 }

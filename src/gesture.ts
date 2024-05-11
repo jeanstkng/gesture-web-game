@@ -126,8 +126,7 @@ async function predictWebcam() {
     gestureOutput.style.width = videoWidth;
     const categoryName = results.gestures[0][0].categoryName;
     const categoryScore = (results.gestures[0][0].score * 100).toFixed(2);
-    const handedness = results.handedness[0][0].displayName;
-    gestureOutput.innerText = `GestureRecognizer: ${categoryName}\n Confidence: ${categoryScore} %\n Handedness: ${handedness}`;
+    gestureOutput.innerText = `Gesture: ${categoryName}\n Confidence: ${categoryScore}`;
     if (+categoryScore >= 50) {
       lastGesture = categoryName.toLowerCase();
     }

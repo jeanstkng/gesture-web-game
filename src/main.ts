@@ -1,11 +1,12 @@
-import * as ex from "excalibur";
 import { loader } from "./resources";
 import { Player } from "./player";
 import { createGestureRecognizer, enableCam, hasGetUserMedia } from "./gesture";
 import { Background } from "./background";
 import { Enemy } from "./enemy";
+import { Engine, Random, SolverStrategy, Timer, Vector, vec } from "excalibur";
+import { gameState } from "./gameState";
 
-const game = new ex.Engine({
+const game = new Engine({
   width: 800,
   height: 600,
   canvasElementId: "game",
@@ -15,8 +16,8 @@ const game = new ex.Engine({
   // Turn off anti-aliasing for pixel art graphics
   antialiasing: false,
   physics: {
-    solver: ex.SolverStrategy.Arcade,
-    gravity: ex.vec(0, 800),
+    solver: SolverStrategy.Arcade,
+    gravity: vec(0, 800),
   },
 });
 
@@ -33,17 +34,18 @@ game.start(loader).then(() => {
   document.getElementById("powers")!.style.visibility = "visible";
 });
 
-const bg1 = new Background(new ex.Vector(400, 565), -800);
-const bg2 = new Background(new ex.Vector(1200, 565), -800);
-const player = new Player(new ex.Vector(100, 528));
+const bg1 = new Background(new Vector(400, 565), -800);
+const bg2 = new Background(new Vector(1200, 565), -800);
+const player = new Player(new Vector(100, 528));
 
-const random = new ex.Random(1337);
-const timer = new ex.Timer({
+const random = new Random();
+const timer = new Timer({
   random,
   randomRange: [750, 1500],
   interval: 1000,
   repeats: true,
   fcn: () => {
+    if (gameState.isDead) return;
     const enemy = new Enemy();
     game.add(enemy);
   },
@@ -54,3 +56,14 @@ game.add(timer);
 game.add(player);
 game.add(bg1);
 game.add(bg2);
+
+document.getElementById("restart")?.addEventListener("click", () => {
+  document.getElementById("restart")!.style.visibility = "hidden";
+  player.resetPlayer();
+  game.currentScene.actors.forEach((actor) => {
+    if (actor.name === "enemy") {
+      actor.kill();
+    }
+  });
+  gameState.isDead = false;
+});
