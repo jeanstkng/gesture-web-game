@@ -1,9 +1,9 @@
 # Ronin Run Gesture
 # Excalibur, Mediapipe and Vite 
 
-Play sample [here](https://excaliburjs.com/sample-tiled-vite)
+Play Game [here](https://jeanstkng.itch.io/gesture-run)
 
-![sample-animation](./sample.gif)
+![game-animation](./game.gif)
 
 ## Running locally
 
