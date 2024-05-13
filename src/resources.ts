@@ -9,6 +9,7 @@ import heroDeathPath from "../img/Martial_Hero_2/Sprites/Death.png?url";
 import heroJumpPath from "../img/Martial_Hero_2/Sprites/Jump.png?url";
 import heroFallPath from "../img/Martial_Hero_2/Sprites/Fall.png?url";
 import backgroundPath from "../img/floor.png?url";
+import cloudPath from "../img/cloud.png?url";
 import wolfAttackPath from "../img/wolf_attack.png?url";
 import goblinRunPath from "../img/Monsters_Creatures_Fantasy/Goblin/Run.png?url";
 import goblinAttackPath from "../img/Monsters_Creatures_Fantasy/Goblin/Attack.png?url";
@@ -55,6 +56,11 @@ const Resources = {
   ),
   BackgroundSpritePng: new ImageSource(
     backgroundPath,
+    false,
+    ImageFiltering.Pixel
+  ),
+  CloudSpritePng: new ImageSource(
+    cloudPath,
     false,
     ImageFiltering.Pixel
   ),

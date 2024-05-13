@@ -9,7 +9,6 @@ import {
   Engine,
   AnimationStrategy,
   vec,
-  Color,
 } from "excalibur";
 import { Resources } from "./resources";
 import { Config } from "./config";
@@ -28,6 +27,7 @@ export class Power extends Actor {
   constructor(pos: Vector) {
     super({
       pos,
+      z: 5,
       width: 256,
       height: 256,
       collisionType: CollisionType.Passive,
@@ -64,13 +64,11 @@ export class Power extends Actor {
 
     this.on("collisionstart", (event) => {
       if (event.other.name === "enemy") {
-        console.log(event.other.id, "evento en power in");
         this.actualEnemiesCollision.push(event.other.id);
       }
     });
     this.on("collisionend", (event) => {
       if (event.other.name === "enemy") {
-        console.log(event.other.id, "evento en power out");
         this.actualEnemiesCollision = this.actualEnemiesCollision.filter(
           (id) => event.other.id !== id
         );
@@ -99,6 +97,7 @@ export class Power extends Actor {
       this.graphics.use("wolf-attack");
       this.scene?.actors.map((actor) => {
         if (this.actualEnemiesCollision.includes(actor.id)) {
+          gameState.score += 20;
           actor.kill();
           this.actualEnemiesCollision = this.actualEnemiesCollision.filter(
             (id) => actor.id !== id
@@ -136,5 +135,6 @@ export class Power extends Actor {
     this.timer = 0;
     this.canAttack = true;
     this.dashArrayIncrement = 283;
+    this.actualEnemiesCollision = [];
   }
 }

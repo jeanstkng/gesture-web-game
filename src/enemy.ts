@@ -39,6 +39,7 @@ export class Enemy extends Actor {
   constructor() {
     super({
       pos: vec(900, 500),
+      z: 1,
       width: 32,
       height: 64,
       collisionType: CollisionType.Passive,
@@ -159,9 +160,8 @@ export class Enemy extends Actor {
   onPreUpdate(_engine: Engine, _elapsedMs: number): void {
     if (gameState.isDead || this.playerTouched) {
       this.vel.x = 0;
-      if (gameState.isDead && this.enemyType === "flyingeye") {
+      if (gameState.isDead && this.enemyType !== "flyingeye")
         this.graphics.use(`${this.enemyType}-idle`);
-      }
 
       return;
     }

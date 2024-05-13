@@ -45,11 +45,11 @@ export class Player extends Actor {
   private canJump: boolean = true;
   private onGround: boolean = true;
   private scoreLabel?: Label;
-  private score: number = 0;
 
   constructor(pos: Vector) {
     super({
       pos,
+      z: 2,
       width: 64,
       height: 96,
       collisionType: CollisionType.Active,
@@ -67,6 +67,7 @@ export class Player extends Actor {
     this.scoreLabel = new Label({
       text: "Score: 0",
       pos: vec(200, 24),
+      z: 10,
       font,
       color: Color.White,
     });
@@ -180,8 +181,8 @@ export class Player extends Actor {
       engine.clock.schedule(() => {
         this.scene?.actors.map((actor) => {
           if (this.actualEnemiesCollision.includes(actor.id)) {
-            this.score += 10;
-            this.scoreLabel!.text = `Score: ${this.score}`;
+            gameState.score += 10;
+            this.scoreLabel!.text = `Score: ${gameState.score}`;
             actor.kill();
             this.actualEnemiesCollision = this.actualEnemiesCollision.filter(
               (id) => actor.id !== id
@@ -250,7 +251,6 @@ export class Player extends Actor {
     };
     this.canJump = true;
     this.onGround = true;
-    this.score = 0;
     this.timer = 0;
     this.jumpTimer = 0;
     this.canAttack = true;

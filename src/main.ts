@@ -1,15 +1,29 @@
 import { loader } from "./resources";
 import { Player } from "./player";
-import { createGestureRecognizer, enableCam, hasGetUserMedia } from "./gesture";
+import {
+  createGestureRecognizer,
+  enableCam,
+  hasGetUserMedia,
+  isPredictionsStarted,
+} from "./gesture";
 import { Background } from "./background";
 import { Enemy } from "./enemy";
-import { Engine, Random, SolverStrategy, Timer, Vector, vec } from "excalibur";
+import {
+  Color,
+  Engine,
+  Random,
+  SolverStrategy,
+  Timer,
+  Vector,
+  vec,
+} from "excalibur";
 import { gameState } from "./gameState";
 
 const game = new Engine({
   width: 800,
   height: 600,
   canvasElementId: "game",
+  backgroundColor: Color.fromHex("#00619a"),
   pixelArt: true,
   pixelRatio: 2,
   fixedUpdateFps: 60,
@@ -21,10 +35,9 @@ const game = new Engine({
   },
 });
 
-createGestureRecognizer();
-
-game.start(loader).then(() => {
+game.start(loader).then(async () => {
   if (hasGetUserMedia()) {
+    await createGestureRecognizer();
     enableCam();
   } else {
     alert("Your browser does not support webcam usage");
@@ -44,8 +57,12 @@ const timer = new Timer({
   randomRange: [750, 1500],
   interval: 1000,
   repeats: true,
-  fcn: () => {
-    if (gameState.isDead) return;
+  fcn: async () => {
+    if (
+      gameState.isDead ||
+      !(await navigator.mediaDevices.getUserMedia({ video: true })).active
+    )
+      return;
     const enemy = new Enemy();
     game.add(enemy);
   },
@@ -66,4 +83,5 @@ document.getElementById("restart")?.addEventListener("click", () => {
     }
   });
   gameState.isDead = false;
+  gameState.score = 0;
 });

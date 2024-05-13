@@ -5,6 +5,8 @@ import {
   GestureRecognizerResult,
 } from "@mediapipe/tasks-vision";
 
+import modelAssetPath from "../res/gesture_recognizer.task?url";
+
 export enum Gestures {
   NONE = "none",
   FOX = "fox",
@@ -30,7 +32,7 @@ export const createGestureRecognizer = async () => {
   );
   gestureRecognizer = await GestureRecognizer.createFromOptions(vision, {
     baseOptions: {
-      modelAssetPath: "./res/gesture_recognizer.task",
+      modelAssetPath,
       delegate: "GPU",
     },
     runningMode: runningMode as any,
