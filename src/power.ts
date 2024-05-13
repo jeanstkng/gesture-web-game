@@ -95,6 +95,7 @@ export class Power extends Actor {
       this.canAttack = false;
       this.wolfAnimation?.reset();
       this.graphics.use("wolf-attack");
+      Resources.WolfSpawnSound.play(0.25);
       this.scene?.actors.map((actor) => {
         if (this.actualEnemiesCollision.includes(actor.id)) {
           gameState.score += 20;

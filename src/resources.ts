@@ -1,4 +1,10 @@
-import { ImageFiltering, ImageSource, Loader, SpriteSheet } from "excalibur";
+import {
+  ImageFiltering,
+  ImageSource,
+  Loader,
+  Sound,
+  SpriteSheet,
+} from "excalibur";
 
 // Import paths to work with Vite
 // Note the ?url suffix
@@ -22,6 +28,10 @@ import mushroomAttackPath from "../img/Monsters_Creatures_Fantasy/Mushroom/Attac
 import mushroomIdlePath from "../img/Monsters_Creatures_Fantasy/Mushroom/Idle.png?url";
 import flyingEyeRunPath from "../img/Monsters_Creatures_Fantasy/Flying eye/Flight.png?url";
 import flyingEyeAttackPath from "../img/Monsters_Creatures_Fantasy/Flying eye/Attack.png?url";
+import playerAttackSoundPath from "../res/player_attack.wav?url";
+import playerDeathSoundPath from "../res/player_death.wav?url";
+import playerJumpSoundPath from "../res/player_jump.wav?url";
+import wolfSpawnSoundPath from "../res/wolf_spawn.wav?url";
 
 const Resources = {
   HeroRunSpriteSheetPng: new ImageSource(
@@ -59,11 +69,7 @@ const Resources = {
     false,
     ImageFiltering.Pixel
   ),
-  CloudSpritePng: new ImageSource(
-    cloudPath,
-    false,
-    ImageFiltering.Pixel
-  ),
+  CloudSpritePng: new ImageSource(cloudPath, false, ImageFiltering.Pixel),
   WolfAttackSpriteSheetPng: new ImageSource(
     wolfAttackPath,
     false,
@@ -124,6 +130,10 @@ const Resources = {
     false,
     ImageFiltering.Pixel
   ),
+  PlayerAttackSound: new Sound(playerAttackSoundPath),
+  PlayerDeathSound: new Sound(playerDeathSoundPath),
+  PlayerJumpSound: new Sound(playerJumpSoundPath),
+  WolfSpawnSound: new Sound(wolfSpawnSoundPath),
 };
 
 const loader = new Loader();
@@ -321,5 +331,5 @@ export {
   flyingEyeAttackSpriteSheet,
   mushroomRunSpriteSheet,
   mushroomAttackSpriteSheet,
-  mushroomIdleSpriteSheet
+  mushroomIdleSpriteSheet,
 };

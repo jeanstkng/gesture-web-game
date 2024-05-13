@@ -1,4 +1,5 @@
 import {
+  Resources,
   playerAttackSpriteSheet,
   playerDeathSpriteSheet,
   playerFallSpriteSheet,
@@ -177,6 +178,7 @@ export class Player extends Actor {
       this.isAttacking = true;
       this.attack?.reset();
       this.graphics.use("attack");
+      Resources.PlayerAttackSound.play(0.25);
 
       engine.clock.schedule(() => {
         this.scene?.actors.map((actor) => {
@@ -209,6 +211,7 @@ export class Player extends Actor {
       this.fall?.reset();
       this.graphics.use("jump");
       this.vel.y = -600;
+      Resources.PlayerJumpSound.play(0.25);
 
       engine.clock.schedule(() => {
         this.graphics.use("fall");

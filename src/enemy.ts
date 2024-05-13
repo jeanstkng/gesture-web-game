@@ -14,6 +14,7 @@ import {
   vec,
 } from "excalibur";
 import {
+  Resources,
   flyingEyeAttackSpriteSheet,
   flyingEyeRunSpriteSheet,
   goblinAttackSpriteSheet,
@@ -147,6 +148,9 @@ export class Enemy extends Actor {
         engine.clock.schedule(() => {
           !this.isDead && this.graphics.use(`${this.enemyType}-attack`);
         }, 300);
+        engine.clock.schedule(() => {
+          !this.isDead && Resources.PlayerDeathSound.play(0.25);
+        }, 650);
         engine.clock.schedule(() => {
           if (!this.isDead) {
             gameState.isDead = true;
